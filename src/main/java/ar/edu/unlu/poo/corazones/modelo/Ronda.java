@@ -6,7 +6,6 @@ import java.util.List;
 
 public class Ronda {
     private final List<Jugador> jugadores = new ArrayList<>();
-    private final List<Carta> cartasGanadas = new ArrayList<>();
     private final List<Carta> cartasJugadas = new ArrayList<>();
     private int nroRonda;
 
@@ -16,7 +15,6 @@ public class Ronda {
         }
         this.nroRonda = 1;
     }
-
     // Ejecutar la lógica base de una ronda: en la primera mano se busca el 2 de trébol,
     // luego se aplica la regla de intercambio (pasar cartas) según nroRonda.
     public void jugarRonda() {
@@ -24,7 +22,6 @@ public class Ronda {
             primerRonda();
         }
         intercambio();
-        // Aquí iría la lógica de jugar cartas por turnos.
     }
 
     // Busca el jugador que tiene el 2 de trébol y lo rota al primer lugar
@@ -50,39 +47,28 @@ public class Ronda {
                     Collections.rotate(jugadores, 2);
                     break; // pasar cruzado (para 4 jugadores)
             default : {
-                return;
                 // mod == 0 -> sin intercambio
             }
         }
     }
-
-    // Mueve las cartas jugadas a las cartas ganadas por el ganador de la baza.
-    // Aquí se simplifica: todas las cartas jugadas se agregan a \`cartasGanadas\` y se limpia la baza.
-    public void sumarCartasDeLaRonda() {
-        cartasGanadas.addAll(cartasJugadas);
+    public void limpiarCartasJugadas(){
         cartasJugadas.clear();
-        nroRonda++;
     }
-
     public void agregarCartaJugada(Carta carta) {
         if (carta != null) {
             cartasJugadas.add(carta);
             }
         }
-
     public List<Jugador> getJugadores() {
         return new ArrayList<>(jugadores);
     }
-
-    public List<Carta> getCartasGanadas() {
-        return new ArrayList<>(cartasGanadas);
-    }
-
     public List<Carta> getCartasJugadas() {
-        return new ArrayList<>(cartasGanadas);
+        return new ArrayList<>(cartasJugadas);
     }
-
     public int getNroRonda() {
         return nroRonda;
+    }
+    public void incrementarRonda(){
+        nroRonda++;
     }
 }
