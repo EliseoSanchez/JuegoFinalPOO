@@ -1,7 +1,5 @@
 package ar.edu.unlu.poo.corazones.modelo;
 
-
-
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
 
 import java.rmi.RemoteException;
@@ -23,6 +21,8 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         return jugadores;
     }
     public void inicio(){
+        Mazo mazo = new Mazo();
+        mazo.repartir(jugadores);
         this.ronda = new Ronda(jugadores);
         ronda.primerRonda();
     }

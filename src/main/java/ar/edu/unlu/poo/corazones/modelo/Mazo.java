@@ -16,19 +16,18 @@ public class Mazo {
             miMazo.add(new Carta(Palo.Corazon,i));
         }
     }
+    //función de Collections para mezclar un array.
     private void mezclarMazo(){
         Collections.shuffle(miMazo);
     }
+    // envía el mazo en una lista que no es modificable.
     public List<Carta> getMazo(){
-        return miMazo;
+        return Collections.unmodifiableList(miMazo);
     }
-    public void repartir(Jugador j1, Jugador j2, Jugador j3, Jugador j4){
+    public void repartir(List<Jugador> jugadores){
         mezclarMazo();
-        for (int i = 0; i < miMazo.size()/4; i++){
-            j1.recibirCarta(miMazo.get(i*4));
-            j2.recibirCarta(miMazo.get(i*4+1));
-            j3.recibirCarta(miMazo.get(i*4+2));
-            j4.recibirCarta(miMazo.get(i*4+3));
+        for(Jugador jugador: jugadores){
+            jugador.recibirCarta(miMazo.removeFirst());
         }
     }
 }
