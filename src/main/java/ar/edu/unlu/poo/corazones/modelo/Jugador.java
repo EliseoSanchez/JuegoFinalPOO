@@ -12,14 +12,16 @@ public class Jugador {
 
     public Jugador(String nombre){
         this.nombre= Objects.requireNonNull(nombre,"Nombre no puede ser nulo").trim();
+        //Objects.requireNonNull = valída que el obj no sea nulo, luego le quita espacios adelante y al final al string.
         if (this.nombre.isEmpty()){
-            throw new IllegalArgumentException("Nombre no puede estar vacio");
+            throw new IllegalArgumentException("Nombre no puede estar vacío");
         }
     }
     public Carta jugarCarta(int indice){
         validarIndiceMano(indice);
         return cartasMano.remove(indice);
     }
+    // muy importante validar siempre el indíce.
     private void validarIndiceMano(int indice){
         if(indice < 0 || indice >= cartasMano.size()){
             throw new IndexOutOfBoundsException("indice invalido: " + indice + " (Tamaño de la mano:" + cartasMano.size() + " ).");
@@ -80,9 +82,10 @@ public class Jugador {
     public int getPuntos(){
         return puntos;
     }
+    //buscamos el 2 de trébol, inicia el jugador con esa carta.
     public boolean dosTrebol() {
         for (Carta carta: cartasMano){
-            if(carta.getPalo().equals(Palo.Trebol) && carta.getId()==2 && carta!=null){
+            if(carta!= null && carta.getPalo().equals(Palo.Trebol) && carta.getId()==2){
                 return true;
             }
         }
