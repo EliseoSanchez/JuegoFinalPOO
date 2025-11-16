@@ -1,27 +1,41 @@
 package ar.edu.unlu.poo.corazones.modelo;
-import ar.edu.unlu.poo.corazones.observer.Observable;
-import ar.edu.unlu.poo.corazones.observer.Observador;
 
+
+
+import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
+
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Principal implements Observable {
-    private List<Observador> observadores;
+public class Corazones extends ObservableRemoto implements ICorazones{
+    private List<Jugador> jugadores;
+    private Ronda ronda;
+    private List<Carta> cartasDeRonda;
 
+    private Jugador jugador;
 
-    @Override
-    public void agregarObserver(Observador observador) {
-        observadores.add(observador);
+    public Corazones(){
+        this.jugadores = new ArrayList<>();
+    }
+
+    public List<Jugador> getJugadores(){
+        return jugadores;
+    }
+    public void inicio(){
+        this.ronda = new Ronda(jugadores);
+        ronda.primerRonda();
+    }
+    public void siguienteRonda(){
+
     }
 
     @Override
-    public void eliminarObserver(Observador observador) {
-        observadores.remove(observador);
+    public void agregarJugador(Jugador jugador) throws RemoteException {
+        jugadores.add(jugador);
+        notificarObservadores(Eventos.NUEVO_JUGADOR);
     }
-
-    @Override
-    public void notificarObserver() {
-        for (Observador observador : observadores){
-            observador.actualizar();
-        }
+    public int getRonda(Ronda ronda){
+        return ronda.getNroRonda();
     }
 }
