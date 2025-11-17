@@ -20,13 +20,18 @@ public class Mazo {
     private void mezclarMazo(){
         Collections.shuffle(miMazo);
     }
-    //reparto la primér carta a cada jugador y la remuevo, luego reinicio el mazo.
+    //reparto la primér carta a cada jugador y la remuevo.
     public void repartir(List<Jugador> jugadores){
         mezclarMazo();
         for(Jugador jugador: jugadores){
-            Carta carta = miMazo.removeFirst();
-            jugador.recibirCarta(carta);
+            for (int i = 0; i < 13; i++) {
+                if (miMazo.isEmpty()) {
+                    throw new IllegalStateException("No hay suficientes cartas para repartir.");
+                }
+                Carta carta = miMazo.remove(0);
+                jugador.recibirCarta(carta);
+            }
         }
-        crearMazo();
+        //el mazo queda vacío, atención con eso!
     }
 }
