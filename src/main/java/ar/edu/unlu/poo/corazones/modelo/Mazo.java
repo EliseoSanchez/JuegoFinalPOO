@@ -4,11 +4,11 @@ import java.util.*;
 
 public class Mazo {
     private final List<Carta> miMazo = new ArrayList<>();
-
     public Mazo(){
         crearMazo();
     }
     private void crearMazo(){
+        miMazo.clear();
         for (int i = 2; i < 15; i++) {
             miMazo.add(new Carta(Palo.Trebol,i));
             miMazo.add(new Carta(Palo.Diamante,i));
@@ -20,14 +20,13 @@ public class Mazo {
     private void mezclarMazo(){
         Collections.shuffle(miMazo);
     }
-    // envía el mazo en una lista que no es modificable.
-    public List<Carta> getMazo(){
-        return Collections.unmodifiableList(miMazo);
-    }
+    //reparto la primér carta a cada jugador y la remuevo, luego reinicio el mazo.
     public void repartir(List<Jugador> jugadores){
         mezclarMazo();
         for(Jugador jugador: jugadores){
-            jugador.recibirCarta(miMazo.removeFirst());
+            Carta carta = miMazo.removeFirst();
+            jugador.recibirCarta(carta);
         }
+        crearMazo();
     }
 }
