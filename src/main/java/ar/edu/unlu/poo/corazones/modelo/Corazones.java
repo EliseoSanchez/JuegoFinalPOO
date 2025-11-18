@@ -70,14 +70,14 @@ public class Corazones extends ObservableRemoto implements ICorazones{
     }
     public Jugador obtenerGanador(){
         int min = 100;
-        int indice;
+        Jugador ganador = null;
         for (Jugador jugador : jugadores){
             if(jugador.getPuntos() < min){
                 min = jugador.getPuntos();
-                indice = jugadores.indexOf(jugador);
+                ganador = jugador;
             }
         }
-        return jugadores.get(indice);
+        return ganador;
     }
     private boolean validarPaloEnMano(Jugador jugador, Palo palo){
         if (palo == null) {return false;}
