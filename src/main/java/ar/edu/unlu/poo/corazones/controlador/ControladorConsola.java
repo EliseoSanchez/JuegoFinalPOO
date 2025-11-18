@@ -6,10 +6,10 @@ import ar.edu.unlu.poo.corazones.vista.VistaConsola;
 
 import java.rmi.RemoteException;
 
-public class ControladorConsola implements I{
+public class ControladorConsola {
     private Corazones modelo;
     private VistaConsola vista;
-
+    /*
     public ControladorConsola(VistaConsola vista) {
         this.modelo = modelo;
         this.vista = vista;
@@ -47,9 +47,9 @@ public class ControladorConsola implements I{
             System.out.printf("Ingresando el jugador n°%d", i + 1);
             String nombre = vista.obtenerOpcionSTR();
             Jugador nuevojugador = new Jugador(nombre);
-            modelo.agregarJugador(nuevojugador);
+            //modelo.agregarJugador(nuevojugador);
         }
         return;
-    }
+    }*/
 }
 
