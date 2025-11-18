@@ -11,8 +11,8 @@ public class Corazones extends ObservableRemoto implements ICorazones{
     private final Map<Jugador, List<Carta>> cartasGanadasPorJugador = new HashMap<>();
     private final Map<Jugador, Integer> puntosAcumulados = new HashMap<>();
     private int nroRonda = 1;
-    private boolean corazon_roto = false;
-    private int indiceLider = 0;
+    private boolean corazon_roto;
+    private int indiceLider;
     private Ronda ronda;
 
     public Corazones (){}
@@ -24,12 +24,12 @@ public class Corazones extends ObservableRemoto implements ICorazones{
             throw new IllegalStateException("Solo se permiten 4 jugadores");
         }
         jugadores.add(jugador);
-        puntosAcumulados.put(jugador,0);
-        cartasGanadasPorJugador.put(jugador,new ArrayList<>());
+        puntosAcumulados.putIfAbsent(jugador,0);
+        cartasGanadasPorJugador.putIfAbsent(jugador,new ArrayList<>());
         notificarObservadores(Eventos.NUEVO_JUGADOR);
     }
     public List<Jugador> getJugadores(){
-        return jugadores;
+        return new ArrayList<>(jugadores);
     }
     public int getNroRonda(){
         return nroRonda;
@@ -41,26 +41,66 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         return indiceLider;
     }
 
-    public void inicio() throws RemoteException{
+    public void iniciarPartida() throws RemoteException{
         if (jugadores.size()!= 4){
             throw new IllegalStateException("se necesitan 4 jugadores para comenzar la partida");
         }
         Mazo mazo = new Mazo();
         mazo.repartir(jugadores);
         manos.clear();
-        this.ronda = new Ronda(jugadores);
+        for (Jugador jugador : jugadores){
+            manos.put(jugador, jugador.getCartasMano());
+            cartasGanadasPorJugador.put(jugador,new ArrayList<>());
+            puntosAcumulados.put(jugador,0);
+        }
+        ronda = new Ronda(jugadores);
         ronda.primerRonda();
+        indiceLider = 0;
+        corazon_roto = false;
+
+        notificarObservadores(Eventos.MANO_INICIADA);
+    }
+    public boolean partidaTerminada(){
+        for (Integer puntos : puntosAcumulados.values()){
+            if(puntos >= 100){
+                return true;
+            }
+        }
+        return false;
+    }
+    public Jugador obtenerGanador(){
+        int min = 100;
+        int indice;
+        for (Jugador jugador : jugadores){
+            if(jugador.getPuntos() < min){
+                min = jugador.getPuntos();
+                indice = jugadores.indexOf(jugador);
+            }
+        }
+        return jugadores.get(indice);
+    }
+    private boolean validarPaloEnMano(Jugador jugador, Palo palo){
+        if (palo == null) {return false;}
+        List<Carta> manoJugador = manos.get(jugador);
+        if (manoJugador == null) {return false;}
+        for(Carta carta : manoJugador){
+            if(palo.equals(carta.getPalo())){return true;}
+        }
+        return false;
+    }
+    public void aplicarIntercambio(List<List<Carta>> cartasIntercambio) throws RemoteException{
+        Objects.requireNonNull(cartasIntercambio,"La lista de listas de cartas a intercambiar no puede ser nula");
+        if(cartasIntercambio.size() != 4){
+            throw new IllegalArgumentException("es necesario 4 listas de cartas para el intercambio");
+        }
+        int mod = getNroRonda() % 4;
+        if(mod == 0){
+            notificarObservadores(Eventos.INTERCAMBIO_REALIZADO);
+            return;
+        }
+
     }
     public void siguienteRonda(){
 
-    }
-
-    @Override
-    public void agregarJugador(Jugador jugador) throws RemoteException {
-        jugadores.add(jugador);
-        notificarObservadores(Eventos.NUEVO_JUGADOR);
-    }
-    public int getRonda(Ronda ronda){
-        return ronda.getNroRonda();
     }
 }
