@@ -31,6 +31,16 @@ public class Corazones extends ObservableRemoto implements ICorazones{
     public List<Jugador> getJugadores(){
         return jugadores;
     }
+    public int getNroRonda(){
+        return nroRonda;
+    }
+    public boolean isCorazon_roto() {
+        return corazon_roto;
+    }
+    public int getIndiceLider() {
+        return indiceLider;
+    }
+
     public void inicio() throws RemoteException{
         if (jugadores.size()!= 4){
             throw new IllegalStateException("se necesitan 4 jugadores para comenzar la partida");
