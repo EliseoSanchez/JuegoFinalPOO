@@ -66,6 +66,6 @@ public class Carta {
     }
     @Override
     public String toString() {
-        return nombre + " de " + palo;
+        return getNombre() + " de " + getPalo();
     }
 }
