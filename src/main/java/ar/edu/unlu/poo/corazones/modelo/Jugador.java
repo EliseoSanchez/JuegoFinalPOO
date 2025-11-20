@@ -31,6 +31,10 @@ public class Jugador {
         Objects.requireNonNull(carta,"La carta no puede ser nula");
         cartasMano.add(carta);
     }
+    public void recibirCarta(List<Carta> cartas){
+        Objects.requireNonNull(cartas,"Las cartas no pueden ser nulas");
+        cartasMano.addAll(cartas);
+    }
     public void sumarCartasGanadas(List<Carta> cartas){
         if (cartas == null || cartas.isEmpty()) {return;}
         cartasGanadas.addAll(cartas);
@@ -59,6 +63,9 @@ public class Jugador {
     }
     public List<Carta> getCartasMano() {
         return cartasMano;
+    }
+    public boolean eliminarCarta(Carta carta){
+        return cartasMano.remove(carta);
     }
     public List<Carta> getCartasGanadas() {
         return cartasGanadas;

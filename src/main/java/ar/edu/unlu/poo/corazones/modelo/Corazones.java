@@ -7,7 +7,7 @@ import java.util.*;
 
 public class Corazones extends ObservableRemoto implements ICorazones{
     private final List<Jugador> jugadores = new ArrayList<>(4);
-    private final Map<Jugador, List<Carta>> manos = new HashMap<>();
+    //private final Map<Jugador, List<Carta>> manos = new HashMap<>();
     private final Map<Jugador, List<Carta>> cartasGanadasPorJugador = new HashMap<>();
     private final Map<Jugador, Integer> puntosAcumulados = new HashMap<>();
     private int nroRonda = 1;
@@ -47,9 +47,9 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         }
         Mazo mazo = new Mazo();
         mazo.repartir(jugadores);
-        manos.clear();
+        //manos.clear();
         for (Jugador jugador : jugadores){
-            manos.put(jugador, jugador.getCartasMano());
+            //manos.put(jugador, jugador.getCartasMano());
             cartasGanadasPorJugador.put(jugador,new ArrayList<>());
             puntosAcumulados.put(jugador,0);
         }
@@ -81,7 +81,8 @@ public class Corazones extends ObservableRemoto implements ICorazones{
     }
     private boolean validarPaloEnMano(Jugador jugador, Palo palo){
         if (palo == null) {return false;}
-        List<Carta> manoJugador = manos.get(jugador);
+        //List<Carta> manoJugador = manos.get(jugador);
+        List<Carta> manoJugador = jugador.getCartasMano();
         if (manoJugador == null) {return false;}
         for(Carta carta : manoJugador){
             if(palo.equals(carta.getPalo())){return true;}
@@ -98,7 +99,36 @@ public class Corazones extends ObservableRemoto implements ICorazones{
             notificarObservadores(Eventos.INTERCAMBIO_REALIZADO);
             return;
         }
-
+        for (List<Carta> listaDeCadaJugador : cartasIntercambio){
+            if(listaDeCadaJugador == null || listaDeCadaJugador.size() != 3){
+                throw new IllegalArgumentException("Cada jugador debe elegir 3 cartas");
+            }
+        }
+        for (int i = 0; i < 4; i++) {
+            Jugador origen = jugadores.get(i);
+            List<Carta> manoDeOrigen = origen.getCartasMano();
+            for (Carta carta : cartasIntercambio.get(i)){
+                boolean cartaRemovida = manoDeOrigen.remove(carta);
+                if(!cartaRemovida){
+                    throw new IllegalArgumentException("La carta" + carta + "no esta en la mano del jugador");
+                }
+            }
+        }
+        int rotacion;
+        switch (mod){
+            case 1 : rotacion =-1; // rotacion hacia la izquierda
+            case 2 : rotacion = 1; // rotacion hacia la derecha
+            case 3 : rotacion = 2; // rotacion hacia enfrente
+            default: rotacion = 0;
+        }
+        List<Carta> cartasRecibir = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            int indiceDeDestino = (i + rotacion + 4) % 4;
+            Jugador destino = jugadores.get(indiceDeDestino);
+            cartasRecibir = cartasIntercambio.get(i);
+            destino.recibirCarta(cartasRecibir);
+        }
+        notificarObservadores(Eventos.INTERCAMBIO_REALIZADO);
     }
     public void siguienteRonda(){
 
