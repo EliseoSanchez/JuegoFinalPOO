@@ -44,6 +44,9 @@ public class Jugador {
             }
         }
     }
+    public void tiroALaLuna(){
+        puntos+=26;
+    }
     private void limpiarCartasGanadas(){
         cartasGanadas.clear();
     }
@@ -76,15 +79,13 @@ public class Jugador {
             System.out.println(cartas.toString());
         }
     }
-    public int contarPuntos(){
+    public void sumarPuntos(){
         int total =0;
         for (Carta carta : cartasGanadas){
             if(carta != null){
                 puntos += carta.getPuntaje();
             }
         }
-        puntos=total;
-        return puntos;
     }
     public int getPuntos(){
         return puntos;

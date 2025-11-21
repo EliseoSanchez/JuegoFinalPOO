@@ -8,5 +8,4 @@ import java.util.List;
 public interface ICorazones extends IObservableRemoto {
     void agregarJugador(Jugador jugador) throws RemoteException;
     List<Jugador> getJugadores() throws RemoteException;
-    void siguienteRonda() throws RemoteException;
 }
