@@ -10,7 +10,6 @@ public class Corazones extends ObservableRemoto implements ICorazones{
     private int nroRondasJugadas;
     private boolean corazonRoto;
     private int indiceLider;
-    private Ronda ronda;
     private boolean primeraMano;
     private int numeroMano = 1;
     public Corazones (){}
@@ -32,8 +31,6 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         }
         Mazo mazo = new Mazo();
         mazo.repartir(jugadores);
-        ronda = new Ronda(jugadores);
-        ronda.primerRonda();
         indiceLider = buscarJugadorConCarta();
         corazonRoto = false;
         nroRondasJugadas=0;
@@ -106,7 +103,6 @@ public class Corazones extends ObservableRemoto implements ICorazones{
             corazonRoto = true;
             notificarObservadores(Eventos.CORAZONES_ROTOS);
         }
-
         // determinar ganador de la ronda
         int ganadorIndice = 0;
         Carta mejor = cartasEnOrden.get(0);
@@ -117,7 +113,6 @@ public class Corazones extends ObservableRemoto implements ICorazones{
                 ganadorIndice = i;
             }
         }
-
         int indiceGanador = (indiceLider + ganadorIndice + 4) % 4;
         Jugador ganador = jugadores.get(indiceGanador);
         // asignar las 4 cartas jugadas al ganador
