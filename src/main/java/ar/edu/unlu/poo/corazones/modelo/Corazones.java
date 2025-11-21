@@ -12,6 +12,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
     private int indiceLider;
     private Ronda ronda;
     private boolean primeraMano;
+    private int numeroMano = 1;
     public Corazones (){}
     @Override
     public void agregarJugador(Jugador jugador) throws RemoteException{
@@ -33,11 +34,21 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         mazo.repartir(jugadores);
         ronda = new Ronda(jugadores);
         ronda.primerRonda();
-        indiceLider = 0;
+        indiceLider = buscarJugadorConCarta();
         corazonRoto = false;
         nroRondasJugadas=0;
         primeraMano = true;
         notificarObservadores(Eventos.MANO_INICIADA);
+    }
+    private int buscarJugadorConCarta() {
+        for (int i = 0; i < 4; i++) {
+            for (Carta carta : jugadores.get(i).getCartasMano()) {
+                if (carta.getPalo().equals(Palo.Trebol) && carta.getId() == 2){
+                    return i;
+                }
+            }
+        }
+        return 0;
     }
     public Jugador jugarRonda(List<Carta> cartasEnOrden) throws RemoteException {
         Objects.requireNonNull(cartasEnOrden, "cartasEnOrden no puede ser nulas");
@@ -98,7 +109,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
 
         // determinar ganador de la ronda
         int ganadorIndice = 0;
-        Carta mejor = cartasEnOrden.getFirst();
+        Carta mejor = cartasEnOrden.get(0);
         for (int i = 1; i < 4; i++) {
             Carta carta = cartasEnOrden.get(i);
             if (carta.getPalo().equals(mejor.getPalo()) && carta.getId() > mejor.getId()) {
@@ -155,12 +166,15 @@ public class Corazones extends ObservableRemoto implements ICorazones{
                 jugador.sumarPuntos();
             }
         }
-        if (ronda == null){
-            ronda = new Ronda(jugadores);
+        for(Jugador jugador : jugadores){
+            jugador.getCartasGanadas().clear();
         }
+
         //ronda.sumarCartasDeLaRonda();
         corazonRoto = false;
         nroRondasJugadas = 0;
+        primeraMano = true;
+        numeroMano ++;
         notificarObservadores(Eventos.PUNTOS_ACTUALIZADOS);
         if (partidaTerminada()){
             notificarObservadores(Eventos.PARTIDA_FINALIZADA);
@@ -193,7 +207,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         if(cartasIntercambio.size() != 4){
             throw new IllegalArgumentException("es necesario 4 listas de cartas para el intercambio");
         }
-        int mod = nroRondasJugadas % 4;
+        int mod = numeroMano % 4;
         if(mod == 0){
             notificarObservadores(Eventos.INTERCAMBIO_REALIZADO);
             return;
