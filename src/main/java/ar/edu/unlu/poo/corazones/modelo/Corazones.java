@@ -89,6 +89,9 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         }
         return false;
     }
+    //metodo de intercambio de cartas finalizado, se encarga de recibir una lista de lista de cartas(de cada jugador)
+    // elimar las cartas de las manos de cada jugador y de repartirlas segun la ronda.
+    // ronda n1 hacia izquierda, n2 hacia derecha, n3 hacia enfrente. n4 no hay intercambio.
     public void aplicarIntercambio(List<List<Carta>> cartasIntercambio) throws RemoteException{
         Objects.requireNonNull(cartasIntercambio,"La lista de listas de cartas a intercambiar no puede ser nula");
         if(cartasIntercambio.size() != 4){
@@ -108,25 +111,21 @@ public class Corazones extends ObservableRemoto implements ICorazones{
             Jugador origen = jugadores.get(i);
             List<Carta> manoDeOrigen = origen.getCartasMano();
             for (Carta carta : cartasIntercambio.get(i)){
-                boolean cartaRemovida = manoDeOrigen.remove(carta);
-                if(!cartaRemovida){
+                if(!manoDeOrigen.remove(carta)){
                     throw new IllegalArgumentException("La carta" + carta + "no esta en la mano del jugador");
                 }
             }
         }
-        int rotacion;
-        switch (mod){
-            case 1 : rotacion =-1; // rotacion hacia la izquierda
-            case 2 : rotacion = 1; // rotacion hacia la derecha
-            case 3 : rotacion = 2; // rotacion hacia enfrente
-            default: rotacion = 0;
-        }
-        List<Carta> cartasRecibir = new ArrayList<>();
+        int rotacion = switch (mod) {
+            case 1 -> -1;// rotacion hacia la izquierda
+            case 2 -> 1;// rotacion hacia la derecha
+            case 3 -> 2;// rotacion hacia enfrente
+            default -> 0;
+        };
         for (int i = 0; i < 4; i++) {
             int indiceDeDestino = (i + rotacion + 4) % 4;
             Jugador destino = jugadores.get(indiceDeDestino);
-            cartasRecibir = cartasIntercambio.get(i);
-            destino.recibirCarta(cartasRecibir);
+            destino.recibirCarta(new ArrayList<>(cartasIntercambio.get(i)));
         }
         notificarObservadores(Eventos.INTERCAMBIO_REALIZADO);
     }
