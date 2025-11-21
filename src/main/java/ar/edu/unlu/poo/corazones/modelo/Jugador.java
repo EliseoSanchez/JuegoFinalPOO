@@ -47,28 +47,11 @@ public class Jugador {
     public void tiroALaLuna(){
         puntos+=26;
     }
-    private void limpiarCartasGanadas(){
-        cartasGanadas.clear();
-    }
-    private void limpiarCartasMano(){
-        cartasMano.clear();
-    }
-    public Carta intercambiarCarta(int indice){
-        validarIndiceMano(indice);
-        return cartasMano.remove(indice);
-    }
-
     public String getNombre() {
         return nombre;
     }
-    public int manoSize(){
-        return cartasMano.size();
-    }
     public List<Carta> getCartasMano() {
         return cartasMano;
-    }
-    public boolean eliminarCarta(Carta carta){
-        return cartasMano.remove(carta);
     }
     public List<Carta> getCartasGanadas() {
         return cartasGanadas;
@@ -89,15 +72,6 @@ public class Jugador {
     }
     public int getPuntos(){
         return puntos;
-    }
-    //buscamos el 2 de trébol, inicia el jugador con esa carta.
-    public boolean dosTrebol() {
-        for (Carta carta: cartasMano){
-            if(carta!= null && carta.getPalo().equals(Palo.Trebol) && carta.getId()==2){
-                return true;
-            }
-        }
-        return false;
     }
     @Override
     public String toString() {

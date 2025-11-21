@@ -246,14 +246,4 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         }
         return false;
     }
-    private boolean validarPaloEnMano(Jugador jugador, Palo palo){
-        if (palo == null) {return false;}
-        //List<Carta> manoJugador = manos.get(jugador);
-        List<Carta> manoJugador = jugador.getCartasMano();
-        if (manoJugador == null) {return false;}
-        for(Carta carta : manoJugador){
-            if(palo.equals(carta.getPalo())){return true;}
-        }
-        return false;
-    }
 }
