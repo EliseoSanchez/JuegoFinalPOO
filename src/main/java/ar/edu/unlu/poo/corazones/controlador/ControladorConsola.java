@@ -1,55 +1,138 @@
 package ar.edu.unlu.poo.corazones.controlador;
 
-import ar.edu.unlu.poo.corazones.modelo.Corazones;
-import ar.edu.unlu.poo.corazones.modelo.Jugador;
+import ar.edu.unlu.poo.corazones.modelo.*;
 import ar.edu.unlu.poo.corazones.vista.VistaConsola;
+import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
+import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 
 import java.rmi.RemoteException;
+import java.util.*;
 
-public class ControladorConsola {
-    private Corazones modelo;
+public class ControladorConsola implements IControladorRemoto {
+    private ICorazones modelo;
     private VistaConsola vista;
-    /*
-    public ControladorConsola(VistaConsola vista) {
-        this.modelo = modelo;
+    private final List<List<Carta>> cartasParaIntercambiar = new ArrayList<>();
+
+    public ControladorConsola(VistaConsola vista){
         this.vista = vista;
+        this.vista.setControlador(this);
+    }
+    @Override
+    public <T extends IObservableRemoto> void setModeloRemoto(T modelo) throws RemoteException {
+        this.modelo = (ICorazones) modelo;
         this.modelo.agregarObservador(this);
     }
+    private boolean hayRondasPorJugar() throws RemoteException {
+        if (modelo.getJugadores().getFirst().getCartasMano().isEmpty()){
+            return false;
+        }
+        return true;
+    }
+    private void jugarManoCompleta() throws RemoteException {
+        while (hayRondasPorJugar()) {
+            jugarRonda();
+        }
+    }
+    private void solicitarIntercambioInicial() throws RemoteException {
+        List<Jugador> jugadores = modelo.getJugadores();
+        cartasParaIntercambiar.clear();
+        vista.mostrarMensaje("\n--- Intercambio inicial de cartas (3 cartas por jugador) ---");
+        for (Jugador jugador : jugadores) {
+            int[] indices = vista.pedirTresCartas(jugador);
+            List<Carta> cartas = new ArrayList<>();
+            for (int indice : indices) {
+                cartas.add(jugador.getCartasMano().get(indice));
+            }
+            cartasParaIntercambiar.add(cartas);
+        }
+        try {
+            modelo.aplicarIntercambio(cartasParaIntercambiar);
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error en intercambio: " + e.getMessage());
+        }
+    }
+    private void jugarRonda() throws RemoteException {
+        List<Jugador> jugadores = modelo.getJugadores();
+        List<Carta> cartasJugadas = new ArrayList<>();
+        vista.mostrarMensaje("\n--- Nueva Ronda ---");
+        vista.mostrarMensaje("\n--- Ronda " + (modelo.getNumeroDeMano() + 1) + " ---");
+        for (Jugador jugador : jugadores) {
+            try {
+                int indice = vista.pedirCarta(jugador);
+                cartasJugadas.add(jugador.getCartasMano().get(indice));
+            } catch (Exception e) {
+                vista.mostrarMensaje("Error al pedir carta: " + e.getMessage());
+                return;
+            }
+        }
+        try {
+            modelo.jugarRonda(cartasJugadas);
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error al jugar ronda: " + e.getMessage());
+        }
+    }
+    public void agregarJugador(String nombre) {
+        try {
+            Jugador jugador = new Jugador(nombre);
+            modelo.agregarJugador(jugador);
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error al agregar jugador: " + e.getMessage());
+        }
+    }
+    public void iniciarPartida() {
+        try {
+            modelo.iniciarPartida();
+        } catch (Exception e) {
+            vista.mostrarMensaje(" No se pudo iniciar la partida: " + e.getMessage());
+        }
+    }
 
-    public void iniciar() {
-        vista.menuPrincipal();
-        while (true) {
-            int opcion = vista.obtenerOpcionINT();
-            switch (opcion) {
-                case 1:
-                    vista.menuJugadores();
-                    nuevoJugador();
-                    vista.menuPrincipal();
-                    break;
-                case 2:
-                    vista.mostrarJugadores(modelo.getJugadores());
-                    vista.menuPrincipal();
-                    break;
-                case 3:
-
-                case 0:
-                    vista.mostrarMensaje("Cerrando menu . . .");
-                    return;
-                default:
-                    vista.mostrarMensaje("Opcion no valida");
-                    break;
+    @Override
+    public void actualizar(IObservableRemoto iObservableRemoto, Object evento) throws RemoteException {
+        Eventos eventoModelo = (Eventos) evento;
+        if(evento == null){
+            vista.mostrarMensaje("Evento desconocido");
+            return;
+        }
+        switch (eventoModelo){
+            case NUEVO_JUGADOR -> {
+                vista.mostrarMensaje("NUEVO JUGADOR");
+                vista.mostrarJugadores(modelo.getJugadores());
+            }
+            case MANO_INICIADA -> {
+                vista.mostrarMensaje("La partida comenzó, los jugadores tienen sus cartas");
+                vista.mostrarJugadores(modelo.getJugadores());
+                solicitarIntercambioInicial();
+            }
+            case INTERCAMBIO_REALIZADO -> {
+                vista.mostrarMensaje("Intercambio Realizado");
+                jugarManoCompleta();
+            }
+            case CORAZONES_ROTOS -> {
+                vista.mostrarMensaje("Corazones rotos!");
+            }
+            case CAMBIO_DE_RONDA -> {
+                vista.mostrarMensaje("Cambio de ronda");
+                if(hayRondasPorJugar()){
+                    jugarRonda();
+                }else {
+                    modelo.siguienteRonda();
+                }
+            }
+            case TIRO_A_LA_LUNA -> {
+                vista.mostrarMensaje("Un jugador logro el Tiro a la luna");
+                vista.mostrarMensaje("Se le agregaran 26 puntos a cada jugador");
+            }
+            case PUNTOS_ACTUALIZADOS -> {
+                vista.mostrarMensaje("Puntos actualizados");
+                vista.mostrarPuntos(modelo.getJugadores());
+            }
+            case PARTIDA_FINALIZADA -> {
+                Jugador ganador = modelo.obtenerGanador();
+                vista.mostrarMensaje("\n🏆 ¡La partida ha terminado! 🏆");
+                vista.mostrarMensaje("Ganador: " + ganador.getNombre() +
+                        " con " + ganador.getPuntos() + " puntos.");
             }
         }
     }
-
-    private void nuevoJugador() throws RemoteException {
-        for (int i = 0; i < 4; i++) {
-            System.out.printf("Ingresando el jugador n°%d", i + 1);
-            String nombre = vista.obtenerOpcionSTR();
-            Jugador nuevojugador = new Jugador(nombre);
-            //modelo.agregarJugador(nuevojugador);
-        }
-        return;
-    }*/
 }
-

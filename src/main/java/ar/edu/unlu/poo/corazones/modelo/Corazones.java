@@ -22,9 +22,11 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         jugadores.add(jugador);
         notificarObservadores(Eventos.NUEVO_JUGADOR);
     }
+    @Override
     public List<Jugador> getJugadores(){
         return new ArrayList<>(jugadores);
     }
+    @Override
     public void iniciarPartida() throws RemoteException{
         if (jugadores.size()!= 4){
             throw new IllegalStateException("se necesitan 4 jugadores para comenzar la partida");
@@ -47,6 +49,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         }
         return 0;
     }
+    @Override
     public Jugador jugarRonda(List<Carta> cartasEnOrden) throws RemoteException {
         Objects.requireNonNull(cartasEnOrden, "cartasEnOrden no puede ser nulas");
         if (cartasEnOrden.size() != 4) {
@@ -125,6 +128,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         notificarObservadores(Eventos.CAMBIO_DE_RONDA);
         return ganador;
     }
+    @Override
     public void siguienteRonda() throws RemoteException {
         if (nroRondasJugadas < 13) {
             throw new IllegalStateException("No se han jugado las 13 rondas aun: Rondas jugadas = " + nroRondasJugadas);
@@ -183,6 +187,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
             }
         return false;
     }
+    @Override
     public Jugador obtenerGanador(){
         int min = 100;
         Jugador ganador = null;
@@ -194,6 +199,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         }
         return ganador;
     }
+    @Override
     public void aplicarIntercambio(List<List<Carta>> cartasIntercambio) throws RemoteException{
         // Metodo de intercambio de cartas finalizado, se encarga de recibir una lista de lista de cartas(de cada jugador)
         // elimar las cartas de las manos de cada jugador y de repartirlas segun la ronda.
@@ -234,6 +240,10 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         }
         notificarObservadores(Eventos.INTERCAMBIO_REALIZADO);
     }
+    @Override
+    public int getNumeroDeMano() throws RemoteException {
+        return 0;
+    }
     private boolean tienePaloEnMano(Jugador jugador,Palo palo){
         List<Carta> manoJugador = jugador.getCartasMano();
         if (manoJugador==null){
@@ -245,5 +255,9 @@ public class Corazones extends ObservableRemoto implements ICorazones{
             }
         }
         return false;
+    }
+    @Override
+    public int getIndiceLider() throws RemoteException{
+        return indiceLider;
     }
 }

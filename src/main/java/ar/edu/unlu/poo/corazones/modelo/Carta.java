@@ -1,5 +1,7 @@
 package ar.edu.unlu.poo.corazones.modelo;
 
+import java.util.*;
+
 public class Carta {
     private final Palo palo;
     private int puntaje;
@@ -67,5 +69,19 @@ public class Carta {
     @Override
     public String toString() {
         return getNombre() + " de " + getPalo();
+    }
+
+    // 🔹 Sobrescribir equals y hashCode
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Carta)) return false;
+        Carta carta = (Carta) obj;
+        return this.id == carta.id && this.palo == carta.palo;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, palo);
     }
 }

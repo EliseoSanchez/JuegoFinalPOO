@@ -27,4 +27,10 @@ public interface ICorazones extends IObservableRemoto {
 
     // Aplicar el intercambio de cartas según la ronda
     void aplicarIntercambio(List<List<Carta>> cartasIntercambio) throws RemoteException;
+
+    // Obtener el número de la ronda
+    int getNumeroDeMano() throws RemoteException;
+
+    // obtiene el indice del lider, muy importante para que el controlador pida las cartas en orden
+    int getIndiceLider () throws RemoteException;
 }
