@@ -2,8 +2,11 @@ package ar.edu.unlu.poo.corazones;
 import ar.edu.unlu.poo.corazones.controlador.ControladorConsola;
 import ar.edu.unlu.poo.corazones.modelo.*;
 import ar.edu.unlu.poo.corazones.vista.VistaConsola;
+
+import java.rmi.RemoteException;
+
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws RemoteException {
         VistaConsola vista = new VistaConsola();
         ControladorConsola controlador = new ControladorConsola(vista);
         Corazones modelo = new Corazones();

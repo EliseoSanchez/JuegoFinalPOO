@@ -86,7 +86,21 @@ public class ControladorConsola implements IControladorRemoto {
             vista.mostrarMensaje("Error al jugar ronda: " + e.getMessage());
         }
     }
-    public void agregarJugador(String nombre) {
+    public void agregarJugador(String nombre) throws RemoteException {
+        boolean repetido = true;
+        List<Jugador> jugadores = modelo.getJugadores();
+
+        while (repetido) {
+            repetido = false; // asumimos que NO está repetido
+            for (Jugador jugador : jugadores) {
+                if (jugador.getNombre().equalsIgnoreCase(nombre)) {
+                    repetido = true;
+                    vista.mostrarMensaje("El nombre '" + nombre + "' ya existe. Ingrese otro nombre:");
+                    nombre = vista.obtenerSiguienteLinea("Nombre del jugador:");
+                    break;
+                    }
+                }
+            }
         try {
             Jugador jugador = new Jugador(nombre);
             modelo.agregarJugador(jugador);
