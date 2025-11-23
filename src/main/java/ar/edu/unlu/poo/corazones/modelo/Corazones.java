@@ -248,7 +248,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
     }
     @Override
     public int getNumeroDeMano() throws RemoteException {
-        return 0;
+        return numeroMano;
     }
     private boolean tienePaloEnMano(Jugador jugador,Palo palo){
         List<Carta> manoJugador = jugador.getCartasMano();

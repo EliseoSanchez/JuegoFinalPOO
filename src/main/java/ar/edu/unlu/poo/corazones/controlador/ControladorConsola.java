@@ -23,10 +23,14 @@ public class ControladorConsola implements IControladorRemoto {
         this.modelo.agregarObservador(this);
     }
     private boolean hayRondasPorJugar() throws RemoteException {
-        if (modelo.getJugadores().get(0).getCartasMano().isEmpty()){
-            return false;
+        List<Jugador> jugadores = modelo.getJugadores();
+        if (jugadores == null || jugadores.isEmpty()) return false;
+        for (Jugador jugador : jugadores) {
+            if (!jugador.getCartasMano().isEmpty()) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
     private void jugarManoCompleta() throws RemoteException {
         while (hayRondasPorJugar()) {
