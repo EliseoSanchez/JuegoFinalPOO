@@ -17,10 +17,6 @@ public class Jugador {
             throw new IllegalArgumentException("Nombre no puede estar vacío");
         }
     }
-    public Carta jugarCarta(int indice){
-        validarIndiceMano(indice);
-        return cartasMano.remove(indice);
-    }
     // muy importante validar siempre el indíce.
     private void validarIndiceMano(int indice){
         if(indice < 0 || indice >= cartasMano.size()){
@@ -38,11 +34,7 @@ public class Jugador {
     public void sumarCartasGanadas(List<Carta> cartas){
         if (cartas == null || cartas.isEmpty()) {return;}
         cartasGanadas.addAll(cartas);
-        for (Carta carta : cartas){
-            if(carta != null){
-                puntos+= carta.getPuntaje();
-            }
-        }
+
     }
     public void tiroALaLuna(){
         puntos+=26;
@@ -56,19 +48,14 @@ public class Jugador {
     public List<Carta> getCartasGanadas() {
         return cartasGanadas;
     }
-
-    public void mostrarCartas(){
-        for(Carta cartas : cartasMano){
-            System.out.println(cartas.toString());
-        }
-    }
     public void sumarPuntos(){
         int total =0;
         for (Carta carta : cartasGanadas){
             if(carta != null){
-                puntos += carta.getPuntaje();
+                total += carta.getPuntaje();
             }
         }
+        puntos+=total;
     }
     public int getPuntos(){
         return puntos;

@@ -17,7 +17,7 @@ public interface ICorazones extends IObservableRemoto {
     void iniciarPartida() throws RemoteException;
 
     // Jugar una ronda pasando las cartas en orden
-    Jugador jugarRonda(List<Carta> cartasEnOrden) throws RemoteException;
+    Jugador jugarRonda(List<Integer> indicesCartas) throws RemoteException;
 
     // Avanzar a la siguiente ronda y actualizar puntajes
     void siguienteRonda() throws RemoteException;

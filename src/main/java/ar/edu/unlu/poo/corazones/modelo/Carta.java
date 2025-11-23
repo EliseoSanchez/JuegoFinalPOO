@@ -59,7 +59,7 @@ public class Carta {
         if(this.palo.equals(Palo.Corazon)){
             puntaje=1;
         }
-        if(this.palo.equals(Palo.Pica) && this.id == 12){
+        else if(this.palo.equals(Palo.Pica) && this.id == 12){
             puntaje=13;
         }
         else {

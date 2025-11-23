@@ -23,7 +23,7 @@ public class ControladorConsola implements IControladorRemoto {
         this.modelo.agregarObservador(this);
     }
     private boolean hayRondasPorJugar() throws RemoteException {
-        if (modelo.getJugadores().getFirst().getCartasMano().isEmpty()){
+        if (modelo.getJugadores().get(0).getCartasMano().isEmpty()){
             return false;
         }
         return true;
@@ -53,20 +53,22 @@ public class ControladorConsola implements IControladorRemoto {
     }
     private void jugarRonda() throws RemoteException {
         List<Jugador> jugadores = modelo.getJugadores();
-        List<Carta> cartasJugadas = new ArrayList<>();
+        List<Integer> indicesCartasJugadas = new ArrayList<>();
         vista.mostrarMensaje("\n--- Nueva Ronda ---");
-        vista.mostrarMensaje("\n--- Ronda " + (modelo.getNumeroDeMano() + 1) + " ---");
-        for (Jugador jugador : jugadores) {
+        int lider = modelo.getIndiceLider();
+        for (int i = 0; i < 4; i++) {
+            int indiceJugador = (lider + i)%4;
+            Jugador jugador = jugadores.get(indiceJugador);
             try {
-                int indice = vista.pedirCarta(jugador);
-                cartasJugadas.add(jugador.getCartasMano().get(indice));
+                int indiceCarta = vista.pedirCarta(jugador);
+                indicesCartasJugadas.add(indiceCarta);
             } catch (Exception e) {
                 vista.mostrarMensaje("Error al pedir carta: " + e.getMessage());
                 return;
             }
         }
         try {
-            modelo.jugarRonda(cartasJugadas);
+            modelo.jugarRonda(indicesCartasJugadas);
         } catch (Exception e) {
             vista.mostrarMensaje("Error al jugar ronda: " + e.getMessage());
         }
@@ -113,9 +115,7 @@ public class ControladorConsola implements IControladorRemoto {
             }
             case CAMBIO_DE_RONDA -> {
                 vista.mostrarMensaje("Cambio de ronda");
-                if(hayRondasPorJugar()){
-                    jugarRonda();
-                }else {
+                if(!hayRondasPorJugar()){
                     modelo.siguienteRonda();
                 }
             }

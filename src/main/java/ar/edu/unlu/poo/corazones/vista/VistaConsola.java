@@ -36,15 +36,8 @@ public class VistaConsola {
     }
     public String obtenerSiguienteLinea(String mensaje){
         System.out.print(mensaje + " ");
-        while(true){
-            String siguienteLinea = sc.nextLine();
-            System.out.print("Confirmar con (1).");
-            String confirmacion = sc.nextLine();
-            if(confirmacion.equals("1")){
-                return siguienteLinea;
-            }
-            System.out.println("Entrada no confirmada. Intente nuevamente.");
-        }
+                return sc.nextLine();
+
     }
     public void mostrarMensaje(String mensaje){
         System.out.println(mensaje);

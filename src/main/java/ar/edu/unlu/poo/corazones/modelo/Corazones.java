@@ -50,37 +50,30 @@ public class Corazones extends ObservableRemoto implements ICorazones{
         return 0;
     }
     @Override
-    public Jugador jugarRonda(List<Carta> cartasEnOrden) throws RemoteException {
-        Objects.requireNonNull(cartasEnOrden, "cartasEnOrden no puede ser nulas");
-        if (cartasEnOrden.size() != 4) {
-            throw new IllegalArgumentException("Se requieren 4 cartas para la ronda");
-        }
+    public Jugador jugarRonda(List<Integer> indicesCartas) throws RemoteException {
+
+        validarCantidadDeCartas(indicesCartas);
 
         Palo paloInicial = null;
         boolean contieneCorazon = false;
-
-        // validar y remover cartas de cada jugador
+        List<Carta> cartasEnOrden = new ArrayList<>();
+        List<Jugador> jugadoresEnOrden = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            int indiceJugador = (indiceLider + i + 4) % 4;
-            Jugador jugador = jugadores.get(indiceJugador);
-            Carta jugada = cartasEnOrden.get(i);
-            Objects.requireNonNull(jugada, "Carta jugada no puede ser nula");
+            int idxJugador = (indiceLider + i) % 4;
+            Jugador jugador = jugadores.get(idxJugador);
+            int idxCarta = indicesCartas.get(i);
 
-            List<Carta> manoVisible = jugador.getCartasMano();
-            if (!manoVisible.contains(jugada)) {
-                throw new IllegalArgumentException("El jugador no tiene la carta jugada en su mano: " + jugada);
-            }
+            Carta carta = obtenerCartaValidada(jugador, idxCarta);
+            cartasEnOrden.add(carta);
+            jugadoresEnOrden.add(jugador);
+        }
+        for (int i = 0; i < 4; i++) {
+            Jugador jugador = jugadoresEnOrden.get(i);
+            Carta jugada = cartasEnOrden.get(i);
+
             if (i == 0) {
+                validarCartaInicial(jugada);
                 paloInicial = jugada.getPalo();
-                if (primeraMano && !Palo.Trebol.equals(paloInicial)) {
-                    throw new IllegalArgumentException("En la primera baza la carta inicial debe ser del palo Trebol");
-                }
-                if (Palo.Corazon.equals(paloInicial) && !corazonRoto) {
-                    throw new IllegalArgumentException("No se puede iniciar una baza con Corazones hasta que estén rotos");
-                }
-                if (primeraMano && jugada.getPuntaje() > 0) {
-                    throw new IllegalArgumentException("En la primera baza no se pueden jugar cartas con puntaje");
-                }
             } else {
                 boolean tienePalo = tienePaloEnMano(jugador, paloInicial);
                 if (tienePalo && !paloInicial.equals(jugada.getPalo())) {
@@ -91,42 +84,55 @@ public class Corazones extends ObservableRemoto implements ICorazones{
                 }
             }
 
-            if (Palo.Corazon.equals(jugada.getPalo())) {
+            if (jugada.getPalo() == Palo.Corazon) {
                 contieneCorazon = true;
             }
-
-            int indice = manoVisible.indexOf(jugada);
-            if (indice < 0) {
-                throw new IllegalStateException("No se pudo localizar la carta en la mano del jugador: " + jugada);
-            }
-            jugador.jugarCarta(indice);
         }
-        // marcar corazones rotos
+        for (int i = 0; i < 4; i++) {
+            jugadoresEnOrden.get(i).getCartasMano().remove(cartasEnOrden.get(i));
+        }
         if (contieneCorazon && !corazonRoto) {
             corazonRoto = true;
             notificarObservadores(Eventos.CORAZONES_ROTOS);
         }
-        // determinar ganador de la ronda
         int ganadorIndice = 0;
         Carta mejor = cartasEnOrden.get(0);
         for (int i = 1; i < 4; i++) {
             Carta carta = cartasEnOrden.get(i);
-            if (carta.getPalo().equals(mejor.getPalo()) && carta.getId() > mejor.getId()) {
+            if (carta.getPalo() == paloInicial && carta.getId() > mejor.getId()) {
                 mejor = carta;
                 ganadorIndice = i;
             }
         }
-        int indiceGanador = (indiceLider + ganadorIndice + 4) % 4;
+        int indiceGanador = (indiceLider + ganadorIndice) % 4;
         Jugador ganador = jugadores.get(indiceGanador);
-        // asignar las 4 cartas jugadas al ganador
-        List<Carta> baza = new ArrayList<>(cartasEnOrden);
-        ganador.sumarCartasGanadas(baza);
-        // actualizar estado
+        ganador.sumarCartasGanadas(cartasEnOrden);
         indiceLider = indiceGanador;
         nroRondasJugadas++;
         primeraMano = false;
         notificarObservadores(Eventos.CAMBIO_DE_RONDA);
         return ganador;
+    }
+    private Carta obtenerCartaValidada(Jugador jugador, int indiceCarta) {
+        if (indiceCarta < 0 || indiceCarta >= jugador.getCartasMano().size()) {
+            throw new IllegalArgumentException("Índice de carta inválido para " + jugador.getNombre());
+        }
+        return jugador.getCartasMano().get(indiceCarta);
+    }
+    private void validarCartaInicial(Carta carta) {
+        if (primeraMano && !(carta.getPalo() == Palo.Trebol && carta.getId() == 2)) {
+            throw new IllegalArgumentException("En la primera jugada la carta inicial debe ser el 2 de Trebol");
+        }
+        if (carta.getPalo() == Palo.Corazon && !corazonRoto) {
+            throw new IllegalArgumentException("No se puede iniciar una ronda con Corazones hasta que estén rotos");
+        }
+        if (primeraMano && carta.getPuntaje() > 0) {
+            throw new IllegalArgumentException("En la primera ronda no se pueden jugar cartas con puntaje");
+        }
+    }
+    private void validarCantidadDeCartas(List<Integer> indicesCartas) {
+        if (indicesCartas.size() != 4)
+            throw new IllegalArgumentException("Se requieren 4 cartas para la ronda");
     }
     @Override
     public void siguienteRonda() throws RemoteException {
