@@ -7,11 +7,11 @@ import java.util.*;
 
 public class Corazones extends ObservableRemoto implements ICorazones{
     private final List<Jugador> jugadores = new ArrayList<>(4);
-    private int nroRondasJugadas;
+    private int nroRondasJugadas; //van de 1 - 13
     private boolean corazonRoto;
     private int indiceLider;
     private boolean primeraMano;
-    private int numeroMano = 1;
+    private int numeroMano = 1; // aumenta cada vez que se juegan las 13 rondas, necesario para el intercambio de cartas
     public Corazones (){}
     @Override
     public void agregarJugador(Jugador jugador) throws RemoteException{
@@ -233,6 +233,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
                 }
             }
         }
+        // La rotacion es para que se intercambien las 3 cartas en la direccion correcta
         int rotacion = switch (mod) {
             case 1 -> -1;// rotacion hacia la izquierda
             case 2 -> 1;// rotacion hacia la derecha
@@ -244,11 +245,9 @@ public class Corazones extends ObservableRemoto implements ICorazones{
             Jugador destino = jugadores.get(indiceDeDestino);
             destino.recibirCarta(new ArrayList<>(cartasIntercambio.get(i)));
         }
+        this.indiceLider = buscarJugadorConCarta(); // despues del intercambio busco el jugador con 2 de trebol
+
         notificarObservadores(Eventos.INTERCAMBIO_REALIZADO);
-    }
-    @Override
-    public int getNumeroDeMano() throws RemoteException {
-        return numeroMano;
     }
     private boolean tienePaloEnMano(Jugador jugador,Palo palo){
         List<Carta> manoJugador = jugador.getCartasMano();

@@ -10,9 +10,10 @@ import java.util.*;
 
 public class ControladorConsola implements IControladorRemoto {
     private ICorazones modelo;
-    private VistaConsola vista;
+    private final VistaConsola vista;
     private final List<List<Carta>> cartasParaIntercambiar = new ArrayList<>();
-
+    private final String RESET = "\u001B[0m";
+    private final String BRIGHT_RED = "\u001B[91m";
     public ControladorConsola(VistaConsola vista){
         this.vista = vista;
         this.vista.setControlador(this);
@@ -58,7 +59,9 @@ public class ControladorConsola implements IControladorRemoto {
     private void jugarRonda() throws RemoteException {
         List<Jugador> jugadores = modelo.getJugadores();
         List<Integer> indicesCartasJugadas = new ArrayList<>();
-        vista.mostrarMensaje("\n--- Nueva Ronda ---");
+        List<Jugador> jugadoresParaVista = new ArrayList<>();
+        List<Carta> cartasParaVista = new ArrayList<>();
+        vista.mostrarMensaje(BRIGHT_RED + "\n--- Nueva Ronda ---" + RESET);
         int lider = modelo.getIndiceLider();
         for (int i = 0; i < 4; i++) {
             int indiceJugador = (lider + i)%4;
@@ -66,13 +69,19 @@ public class ControladorConsola implements IControladorRemoto {
             try {
                 int indiceCarta = vista.pedirCarta(jugador);
                 indicesCartasJugadas.add(indiceCarta);
+                jugadoresParaVista.add(jugador);
+                cartasParaVista.add(jugador.getCartasMano().get(indiceCarta));
+                if(i< 3) {
+                    vista.mostrarCartasJugadas(jugadoresParaVista,cartasParaVista);
+                }
             } catch (Exception e) {
                 vista.mostrarMensaje("Error al pedir carta: " + e.getMessage());
                 return;
             }
         }
         try {
-            modelo.jugarRonda(indicesCartasJugadas);
+            Jugador ganador = modelo.jugarRonda(indicesCartasJugadas);
+            vista.mostrarCartasGanadas(ganador,cartasParaVista);
         } catch (Exception e) {
             vista.mostrarMensaje("Error al jugar ronda: " + e.getMessage());
         }
@@ -102,38 +111,39 @@ public class ControladorConsola implements IControladorRemoto {
         }
         switch (eventoModelo){
             case NUEVO_JUGADOR -> {
-                vista.mostrarMensaje("NUEVO JUGADOR");
+                vista.mostrarMensaje(BRIGHT_RED +"NUEVO JUGADOR"+ RESET);
                 vista.mostrarJugadores(modelo.getJugadores());
             }
             case MANO_INICIADA -> {
-                vista.mostrarMensaje("La partida comenzó, los jugadores tienen sus cartas");
+                vista.mostrarMensaje(BRIGHT_RED + "La partida comenzó, los jugadores tienen sus cartas"+RESET);
                 vista.mostrarJugadores(modelo.getJugadores());
                 solicitarIntercambioInicial();
             }
             case INTERCAMBIO_REALIZADO -> {
-                vista.mostrarMensaje("Intercambio Realizado");
+                vista.mostrarMensaje(BRIGHT_RED + "Intercambio Realizado" + RESET);
                 jugarManoCompleta();
             }
             case CORAZONES_ROTOS -> {
-                vista.mostrarMensaje("Corazones rotos!");
+                vista.mostrarMensaje(BRIGHT_RED + "Corazones rotos!"+ RESET);
             }
             case CAMBIO_DE_RONDA -> {
-                vista.mostrarMensaje("Cambio de ronda");
+                System.out.println();
+                vista.mostrarMensaje(BRIGHT_RED + "Cambio de ronda" + RESET);
                 if(!hayRondasPorJugar()){
                     modelo.siguienteRonda();
                 }
             }
             case TIRO_A_LA_LUNA -> {
-                vista.mostrarMensaje("Un jugador logro el Tiro a la luna");
+                vista.mostrarMensaje(BRIGHT_RED + "Un jugador logro el Tiro a la luna"+ RESET);
                 vista.mostrarMensaje("Se le agregaran 26 puntos a cada jugador");
             }
             case PUNTOS_ACTUALIZADOS -> {
-                vista.mostrarMensaje("Puntos actualizados");
+                vista.mostrarMensaje(BRIGHT_RED + "Puntos actualizados" + RESET);
                 vista.mostrarPuntos(modelo.getJugadores());
             }
             case PARTIDA_FINALIZADA -> {
                 Jugador ganador = modelo.obtenerGanador();
-                vista.mostrarMensaje("\n🏆 ¡La partida ha terminado! 🏆");
+                vista.mostrarMensaje(BRIGHT_RED + "\n🏆 ¡La partida ha terminado! 🏆" + RESET);
                 vista.mostrarMensaje("Ganador: " + ganador.getNombre() +
                         " con " + ganador.getPuntos() + " puntos.");
             }

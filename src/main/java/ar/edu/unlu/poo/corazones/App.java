@@ -29,8 +29,10 @@ public class App {
                     }
                 }
                 case 3 -> {
-                    // Iniciar partida
                     controlador.iniciarPartida();
+                }
+                case 4 ->{
+                    vista.mostrarReglas();
                 }
                 case 0 -> {
                     vista.mostrarMensaje("Saliendo del juego...");

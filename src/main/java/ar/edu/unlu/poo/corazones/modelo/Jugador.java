@@ -17,12 +17,6 @@ public class Jugador {
             throw new IllegalArgumentException("Nombre no puede estar vacío");
         }
     }
-    // muy importante validar siempre el indíce.
-    private void validarIndiceMano(int indice){
-        if(indice < 0 || indice >= cartasMano.size()){
-            throw new IndexOutOfBoundsException("indice invalido: " + indice + " (Tamaño de la mano:" + cartasMano.size() + " ).");
-        }
-    }
     public void recibirCarta(Carta carta){
         Objects.requireNonNull(carta,"La carta no puede ser nula");
         cartasMano.add(carta);
