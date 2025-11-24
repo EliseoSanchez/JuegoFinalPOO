@@ -44,4 +44,9 @@ El proyecto está estructurado siguiendo el patrón **MVC**, que separa claramen
 
 ---
 
+### 🖼️ Diagrama UML del Proyecto
+El siguiente diagrama UML muestra la estructura general del sistema, incluyendo las clases de modelo, vista y controlador:
+
+![Diagrama UML](https://raw.githubusercontent.com/EliseoSanchez/JuegoFinalPOO/master/UML_Diagrama.svg)
+
 © 2025 - Eliseo Sanchez
