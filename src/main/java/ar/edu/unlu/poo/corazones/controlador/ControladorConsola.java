@@ -115,7 +115,6 @@ public class ControladorConsola implements IControladorRemoto {
             vista.mostrarMensaje(" No se pudo iniciar la partida: " + e.getMessage());
         }
     }
-
     @Override
     public void actualizar(IObservableRemoto iObservableRemoto, Object evento) throws RemoteException {
         Eventos eventoModelo = (Eventos) evento;

@@ -185,7 +185,7 @@ public class Corazones extends ObservableRemoto implements ICorazones{
             notificarObservadores(Eventos.PARTIDA_FINALIZADA);
         }
     }
-    public boolean partidaTerminada(){
+    private boolean partidaTerminada(){
             for (Jugador jugador : jugadores){
                 if(jugador.getPuntos()>= 100){
                     return true;
